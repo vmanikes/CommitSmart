@@ -1,0 +1,232 @@
+openapi: 3.0.1
+info:
+  title: Bank API
+  version: 0.0.1
+paths:
+  /health:
+    get:
+      tags:
+        - default
+      summary: Returns health of the service.
+      description: Returns health of the service.
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/deposit:
+    post:
+      summary: Deposit funds into an account
+      description: Deposit funds into an account
+      parameters:
+        - in: header
+          name: x-request-id
+          description: Unique ID for the request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: "FORBIDDEN"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "INTERNAL SERVER ERROR"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/withdraw:
+    post:
+      summary: Withdraw funds from an account
+      description: Withdraw funds from an account
+      parameters:
+        - in: header
+          name: x-request-id
+          description: Unique ID for the request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawRequest'
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: "FORBIDDEN"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "INTERNAL SERVER ERROR"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/transfer:
+    post:
+      summary: Transfer funds from an account
+      description: Transfer funds from an account
+      parameters:
+        - in: header
+          name: x-request-id
+          description: Unique ID for the request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: "FORBIDDEN"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "INTERNAL SERVER ERROR"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/users/{user_id}/transactions:
+    get:
+      summary: View the transactions of a user
+      description: View the transactions of a user
+      parameters:
+        - in: header
+          name: x-request-id
+          description: Unique ID for the request
+        - in: query
+          name: filter_type
+          description: "Allowed values are deposit, withdraw, date"
+        - in: query
+          name: filter_value
+          description: Only works if the filter type is date, the date format should be yyyy-mm-dd
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        400:
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: "FORBIDDEN"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "INTERNAL SERVER ERROR"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        balance:
+          type: string
+        type:
+          type: string
+        amount:
+          type: number
+        created_on:
+          type: date-time
+      required:
+        - id
+        - user_id
+        - balance
+        - type
+        - amount
+        - created_on
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+    DepositRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        account_number:
+          type: integer
+      required:
+        - amount
+        - account_number
+
+    WithdrawRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        account_number:
+          type: integer
+        user_id:
+          type: string
+      required:
+        - amount
+        - account_number
+        - user_id
+
+    TransferRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        current_account_number:
+          type: integer
+        destination_account_number:
+          type: integer
+      required:
+        - amount
+        - current_account_number
+        - destination_account_number
